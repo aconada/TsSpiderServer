@@ -1,4 +1,4 @@
 *.pyc
-.idea
+.idea/
 logs/logs_info.txt
 logs/logs_error.txt

@@ -100,3 +100,6 @@ class DBManager:
 
     def find_one_by_key(self, request={}):
         return self.table.find_one(request)
+
+    def drop(self):
+        self.table.drop()
