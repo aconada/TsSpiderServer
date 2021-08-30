@@ -72,7 +72,7 @@ def start_bp():
     ste = TsStrategyExpma()
     history_capital.append(capital_base)
     # 初始化时间轴
-    date_list = date_range("2017-05-08", "2017-09-30")
+    date_list = date_range("2016-01-01", str(datetime.date.today()))
     for index in range(len(date_list)):
         cur_date = date_list[index]
         print(cur_date)

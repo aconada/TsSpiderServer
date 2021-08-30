@@ -28,12 +28,13 @@ class WmacdUtils:
     # 初始化wmacd数据
     def init_w_time(self):
         # 初始化时间轴
-        date_list = date_range("2016-01-04", "2018-12-30")
+        date_list = date_range("2016-01-01", str(datetime.date.today()))
         # tk_details = self.dm.find_by_key({"code": code, "cur_timer": {"$in": cur_date_list}})
         code_list = self.db_manager_wm.get_code_list()
         for code_item in code_list:
             code = code_item["code"]
             print(code)
+            print(self.db_manager_tk.find_by_key({"code": code}))
             tk_result = self.db_manager_tk.find_by_key({"code": code})[0]
             tk_details = sorted(tk_result["price_list"], key=lambda x: cmp_datatime_02(x), reverse=False)
             for index in range(len(date_list)):
@@ -76,7 +77,7 @@ class WmacdUtils:
                     self.db_manager_wm.add_tk_item(code, wmacd_item)
 
     def update_w_macd(self, cur_date=datetime.datetime.now().date()):
-        date_list = date_range("2016-01-04", "2018-12-30")
+        date_list = date_range("2016-01-01", str(datetime.date.today()))
         for index in range(len(date_list)):
             # 匹配到当前时间所在的区间
             if datetime.datetime.strptime(date_list[index], "%Y-%m-%d").weekday() == 0:
@@ -113,5 +114,5 @@ class WmacdUtils:
 
 if __name__ == "__main__":
     wu = WmacdUtils()
-    # wu.init_w_time()
-    wu.update_w_macd()
+    wu.init_w_time()
+    # wu.update_w_macd()

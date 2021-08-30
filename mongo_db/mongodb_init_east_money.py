@@ -16,6 +16,30 @@ from logs.logs_manager import add_error_logs
 from mongo_db.mongodb_manager import DBManager
 
 
+def check_code_in_300(code):
+    if code.startswith("30"):
+        if mod_config.get_custom_config("custom", "300_switch") == "on":
+            return True
+        else:
+            return False
+    else:
+        return True
+
+
+def check_code_in_688(code):
+    if code.startswith("68"):
+        if mod_config.get_custom_config("custom", "688_switch") == "on":
+            return True
+        else:
+            return False
+    else:
+        return True
+
+
+def check_code(code):
+    return check_code_in_300(code) and check_code_in_688(code)
+
+
 def init_stock_info_list():
     """
     初始化股票信息列表，数据来源东方财富
@@ -26,22 +50,22 @@ def init_stock_info_list():
     for stock_info_item in get_stock_info_list_by_hushen():
         stock_infos.append(stock_info_item)
         stock_codes.append(stock_info_item.get("code"))
+
     for stock_info_item in get_stock_info_list_by_shangzheng():
         if stock_info_item.get("code") not in stock_codes:
             stock_infos.append(stock_info_item)
+
     for stock_info_item in get_stock_info_list_by_new():
         if stock_info_item.get("code") not in stock_codes:
             stock_infos.append(stock_info_item)
 
-    if mod_config.get_custom_config("custom", "300_switch") == "on":
-        for stock_info_item in get_stock_info_list_by_chuangye():
-            if stock_info_item.get("code") not in stock_codes:
-                stock_infos.append(stock_info_item)
+    for stock_info_item in get_stock_info_list_by_chuangye():
+        if stock_info_item.get("code") not in stock_codes:
+            stock_infos.append(stock_info_item)
 
-    if mod_config.get_custom_config("custom", "688_switch") == "on":
-        for stock_info_item in get_stock_info_list_by_kechuang():
-            if stock_info_item.get("code") not in stock_codes:
-                stock_infos.append(stock_info_item)
+    for stock_info_item in get_stock_info_list_by_kechuang():
+        if stock_info_item.get("code") not in stock_codes:
+            stock_infos.append(stock_info_item)
     return stock_infos
 
 
@@ -133,8 +157,8 @@ def parse_pager(content, jquery):
     content_data = content_json.get("data")
     for item in content_data.get("diff"):
         code, name = item.get("f12"), item.get("f14")
-        if name.find("ST") < 0:
-            stock_infos.append({"code": code, "name": name})
+        if name.find("ST") < 0 and check_code(code):
+            stock_infos.append({"code": code, "name": name, "price_list": []})
     return stock_infos
 
 
@@ -143,7 +167,7 @@ def get_stock_code(item):
 
 
 if __name__ == '__main__':
-    dm = DBManager("wm_details")
+    dm = DBManager("tk_details")
     dm.drop()
     stock_info_list = init_stock_info_list()
     stock_info_list.sort(key=get_stock_code)
